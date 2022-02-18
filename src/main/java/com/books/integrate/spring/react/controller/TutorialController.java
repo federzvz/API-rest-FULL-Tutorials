@@ -64,7 +64,7 @@ public class TutorialController {
 	public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
 		try {
 			Tutorial _tutorial = tutorialRepository
-					.save(new Tutorial(tutorial.getTitle(), tutorial.getDescription(),  false));
+					.save(new Tutorial(tutorial.getTitle(),tutorial.getDescription(),false,tutorial.getPrice()));
 			return new ResponseEntity<>(_tutorial, HttpStatus.CREATED);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED);
@@ -80,6 +80,7 @@ public class TutorialController {
 			_tutorial.setTitle(tutorial.getTitle());
 			_tutorial.setDescription(tutorial.getDescription());
 			_tutorial.setPublished(tutorial.isPublished());
+			_tutorial.setPrice(tutorial.getPrice());
 			return new ResponseEntity<>(tutorialRepository.save(_tutorial), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -153,6 +154,7 @@ public class TutorialController {
 					tutorialList.get(i).setTitle(tutorial.getTitle());
 					tutorialList.get(i).setDescription(tutorial.getDescription());
 					tutorialList.get(i).setPublished(tutorial.isPublished());
+					tutorialList.get(i).setPrice(tutorial.getPrice());
 					tutorialRepository.save(tutorialList.get(i));
 					return new ResponseEntity<>("El tutotiral con titulo "+title+" ha sido actualizado.",HttpStatus.OK);
 				}
@@ -160,6 +162,17 @@ public class TutorialController {
 			return new ResponseEntity<>("El tutotiral con titulo "+title+" no se ha podido actualizar.",HttpStatus.CONFLICT);
 		}catch(Exception e){
 			return new ResponseEntity<>("El tutotiral con titulo "+title+" no se ha podido actualizar.",HttpStatus.CONFLICT);
+		}
+	}
+
+	@GetMapping("/tutorials/precio/{price}")
+	public ResponseEntity<List<Tutorial>> getTutorialByPrice(@PathVariable("price") double price) {
+		try{
+			List<Tutorial> tutorialList = new ArrayList<>();
+			tutorialList = tutorialRepository.findByPrice(price);
+			return new ResponseEntity<>(tutorialList, HttpStatus.OK);
+		}catch(Exception e){
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		}
 	}
 
