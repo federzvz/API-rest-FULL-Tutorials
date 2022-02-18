@@ -97,6 +97,25 @@ public class TutorialController {
 		}
 	}
 
+	@DeleteMapping("/tutorials/delete/{title}")
+	public ResponseEntity<String> deleteTutorialByTitle(@PathVariable("title") String title) {
+		try{
+			//Obtengo una lista de los tutoriales con el Título especificado
+			List<Tutorial> tutorial = new ArrayList<>();
+			tutorial = tutorialRepository.findByTitleContaining(title);
+			//Itero entre los tutoriales, verifico que el Título sea el especificado, obtengo su ID y lo elimino.
+			for(int i=0;i<tutorial.size();i++){
+				if(tutorial.get(i).getTitle().equalsIgnoreCase(title)){
+					//Obtengo el ID del tutorial a eliminar, y es eliminado.
+					tutorialRepository.deleteById(tutorial.get(i).getId());
+					return new ResponseEntity<>("El tutotiral con titulo "+title+" ha sido eliminado.",HttpStatus.OK);
+				}
+			}
+			return new ResponseEntity<>("El tutotiral con titulo "+title+" no se ha podido eliminar.",HttpStatus.BAD_REQUEST);
+		}catch(Exception e){
+			return new ResponseEntity<>("El tutotiral con titulo "+title+" no se ha podido eliminar.",HttpStatus.BAD_REQUEST);
+		}
+	}
 	@DeleteMapping("/tutorials")
 	public ResponseEntity<HttpStatus> deleteAllTutorials() {
 		try {
