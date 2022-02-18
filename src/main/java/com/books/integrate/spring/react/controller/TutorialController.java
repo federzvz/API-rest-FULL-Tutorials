@@ -111,9 +111,9 @@ public class TutorialController {
 					return new ResponseEntity<>("El tutotiral con titulo "+title+" ha sido eliminado.",HttpStatus.OK);
 				}
 			}
-			return new ResponseEntity<>("El tutotiral con titulo "+title+" no se ha podido eliminar.",HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("El tutotiral con titulo "+title+" no se ha podido eliminar.",HttpStatus.CONFLICT);
 		}catch(Exception e){
-			return new ResponseEntity<>("El tutotiral con titulo "+title+" no se ha podido eliminar.",HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("El tutotiral con titulo "+title+" no se ha podido eliminar.",HttpStatus.CONFLICT);
 		}
 	}
 	@DeleteMapping("/tutorials")
@@ -138,6 +138,28 @@ public class TutorialController {
 			return new ResponseEntity<>(tutorials, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+		}
+	}
+
+	@PutMapping("/tutorials/update/{title}")
+	public ResponseEntity<String> updateByTitle(@PathVariable("title") String title, @RequestBody Tutorial tutorial){
+		try{
+			//Obtengo una lista de los tutoriales con el Título especificado
+			List<Tutorial> tutorialList = new ArrayList<>();
+			tutorialList = tutorialRepository.findByTitleContaining(title);
+			//Itero entre los tutoriales, verifico que el Título sea el especificado, y es actualizado.
+			for(int i=0;i<tutorialList.size();i++){
+				if(tutorialList.get(i).getTitle().equalsIgnoreCase(title)){
+					tutorialList.get(i).setTitle(tutorial.getTitle());
+					tutorialList.get(i).setDescription(tutorial.getDescription());
+					tutorialList.get(i).setPublished(tutorial.isPublished());
+					tutorialRepository.save(tutorialList.get(i));
+					return new ResponseEntity<>("El tutotiral con titulo "+title+" ha sido actualizado.",HttpStatus.OK);
+				}
+			}
+			return new ResponseEntity<>("El tutotiral con titulo "+title+" no se ha podido actualizar.",HttpStatus.CONFLICT);
+		}catch(Exception e){
+			return new ResponseEntity<>("El tutotiral con titulo "+title+" no se ha podido actualizar.",HttpStatus.CONFLICT);
 		}
 	}
 
